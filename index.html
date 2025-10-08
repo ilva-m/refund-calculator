@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор сроков возврата (14 дней)</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    text-align: center;
+    color: white;
+    font-size: 32px;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  
+  .card-icon {
+    font-size: 32px;
+    margin-right: 12px;
+  }
+  
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+  
+  .time-display {
+    font-size: 48px;
+    font-weight: bold;
+    color: #667eea;
+    margin: 16px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .date-display {
+    font-size: 24px;
+    color: #7f8c8d;
+    font-weight: 500;
+  }
+  
+  .cutoff-date {
+    font-size: 36px;
+    font-weight: bold;
+    color: #e74c3c;
+    margin: 16px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .info-text {
+    font-size: 15px;
+    color: #7f8c8d;
+    line-height: 1.6;
+    margin-top: 12px;
+  }
+  
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  
+  .input-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .input-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+  }
+  
+  .input-group input {
+    padding: 14px 16px;
+    font-size: 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    transition: all 0.3s;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .input-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+  
+  .input-group input::placeholder {
+    color: #bdc3c7;
+  }
+  
+  .result {
+    padding: 24px;
+    border-radius: 12px;
+    font-size: 18px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  
+  .result.valid {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 3px solid #28a745;
+  }
+  
+  .result.invalid {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 3px solid #dc3545;
+  }
+  
+  .result.neutral {
+    background: linear-gradient(135deg, #e7f3ff 0%, #d1e7ff 100%);
+    color: #004085;
+    border: 3px solid #667eea;
+  }
+  
+  .result-time {
+    font-weight: bold;
+    font-size: 32px;
+    margin: 16px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .result-status {
+    font-size: 20px;
+    margin-top: 12px;
+    font-weight: 600;
+  }
+  
+  .example-box {
+    background: #f8f9fa;
+    border-left: 4px solid #667eea;
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  
+  .example-box p {
+    color: #495057;
+    line-height: 1.6;
+    margin: 6px 0;
+  }
+  
+  .example-box strong {
+    color: #2c3e50;
+  }
+  
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    
+    .card {
+      padding: 20px;
+    }
+    
+    .input-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    
+    .time-display {
+      font-size: 36px;
+    }
+    
+    .cutoff-date {
+      font-size: 28px;
+    }
+    
+    .result-time {
+      font-size: 24px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>⏰ Калькулятор сроков возврата (14 дней)</h1>
+  
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🕐</div>
+      <div class="card-title">Текущее время UTC</div>
+    </div>
+    <div class="time-display" id="currentTime">--:--:--</div>
+    <div class="date-display" id="currentDate">--.--.----</div>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📅</div>
+      <div class="card-title">Крайняя дата для возврата</div>
+    </div>
+    <div class="cutoff-date" id="cutoffDate">--.--.---- --:--</div>
+    <div class="info-text">
+      Покупки, совершённые <strong>после</strong> этой даты и времени, подходят под условия возврата (прошло менее 14 дней)
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🧮</div>
+      <div class="card-title">Калькулятор проверки покупки</div>
+    </div>
+    
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="purchaseDate">Дата покупки (UTC)</label>
+        <input type="text" id="purchaseDate" placeholder="дд.мм.гггг" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label for="purchaseTime">Время покупки (UTC)</label>
+        <input type="text" id="purchaseTime" placeholder="чч:мм" autocomplete="off">
+      </div>
+    </div>
+    
+    <div id="result" class="result neutral">
+      Введите дату и время покупки для расчёта
+    </div>
+    
+    <div class="example-box">
+      <p><strong>Примеры форматов:</strong></p>
+      <p>Дата: 24.09.2025 или 01.10.2025</p>
+      <p>Время: 15:30 или 09:05</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function pad(n) {
+  return n < 10 ? '0' + n : n;
+}
+
+function updateCurrentTime() {
+  const now = new Date();
+  
+  // Текущее время UTC
+  const hours = pad(now.getUTCHours());
+  const minutes = pad(now.getUTCMinutes());
+  const seconds = pad(now.getUTCSeconds());
+  const day = pad(now.getUTCDate());
+  const month = pad(now.getUTCMonth() + 1);
+  const year = now.getUTCFullYear();
+  
+  document.getElementById('currentTime').textContent = hours + ':' + minutes + ':' + seconds;
+  document.getElementById('currentDate').textContent = day + '.' + month + '.' + year;
+  
+  // Крайняя дата (14 дней назад)
+  const cutoff = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const cDay = pad(cutoff.getUTCDate());
+  const cMonth = pad(cutoff.getUTCMonth() + 1);
+  const cYear = cutoff.getUTCFullYear();
+  const cHours = pad(cutoff.getUTCHours());
+  const cMinutes = pad(cutoff.getUTCMinutes());
+  
+  document.getElementById('cutoffDate').textContent = 
+    cDay + '.' + cMonth + '.' + cYear + ' ' + cHours + ':' + cMinutes;
+}
+
+function calculate() {
+  const dateVal = document.getElementById('purchaseDate').value.trim();
+  const timeVal = document.getElementById('purchaseTime').value.trim();
+  const resultDiv = document.getElementById('result');
+  
+  if (!dateVal || !timeVal) {
+    resultDiv.className = 'result neutral';
+    resultDiv.innerHTML = 'Введите дату и время покупки для расчёта';
+    return;
+  }
+  
+  const dateParts = dateVal.split('.');
+  const timeParts = timeVal.split(':');
+  
+  if (dateParts.length !== 3 || timeParts.length !== 2) {
+    resultDiv.className = 'result neutral';
+    resultDiv.innerHTML = '❌ Неверный формат. Используйте дд.мм.гггг и чч:мм';
+    return;
+  }
+  
+  const day = parseInt(dateParts[0]);
+  const month = parseInt(dateParts[1]);
+  const year = parseInt(dateParts[2]);
+  const hours = parseInt(timeParts[0]);
+  const minutes = parseInt(timeParts[1]);
+  
+  if (isNaN(day) || isNaN(month) || isNaN(year) || isNaN(hours) || isNaN(minutes)) {
+    resultDiv.className = 'result neutral';
+    resultDiv.innerHTML = '❌ Неверный формат даты или времени';
+    return;
+  }
+  
+  if (month < 1 || month > 12 || day < 1 || day > 31 || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+    resultDiv.className = 'result neutral';
+    resultDiv.innerHTML = '❌ Некорректные значения даты или времени';
+    return;
+  }
+  
+  const purchaseDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+  
+  if (isNaN(purchaseDate.getTime())) {
+    resultDiv.className = 'result neutral';
+    resultDiv.innerHTML = '❌ Некорректная дата';
+    return;
+  }
+  
+  const now = new Date();
+  const diff = now.getTime() - purchaseDate.getTime();
+  
+  if (diff < 0) {
+    resultDiv.className = 'result neutral';
+    resultDiv.innerHTML = '⚠️ Дата покупки в будущем';
+    return;
+  }
+  
+  const totalMinutes = Math.floor(diff / 60000);
+  const days = Math.floor(totalMinutes / 1440);
+  const hrs = Math.floor((totalMinutes % 1440) / 60);
+  const mins = totalMinutes % 60;
+  
+  const isValid = days < 14;
+  
+  resultDiv.className = isValid ? 'result valid' : 'result invalid';
+  resultDiv.innerHTML = 
+    '<div class="result-time">' + days + ' дней ' + hrs + ' часов ' + mins + ' минут</div>' +
+    '<div class="result-status">' + 
+    (isValid ? '✅ Возврат возможен (прошло менее 14 дней)' : '❌ Возврат невозможен (прошло 14 дней или более)') +
+    '</div>';
+}
+
+document.getElementById('purchaseDate').addEventListener('input', calculate);
+document.getElementById('purchaseTime').addEventListener('input', calculate);
+
+updateCurrentTime();
+setInterval(updateCurrentTime, 1000);
+</script>
+
+</body>
+</html>
